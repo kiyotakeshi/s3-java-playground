@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AWSS3ServiceTests {
@@ -44,12 +46,16 @@ class AWSS3ServiceTests {
         LocalDateTime now = LocalDateTime.now();
         sut.createBucket(now);
 
-        Bucket found = s3Client.listBuckets()
+        long newBucketCount = s3Client.listBuckets()
                 .stream()
                 .filter(bucket -> bucket.getName().equals(AWSS3Service.BUCKET_PREFIX + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))))
-                .findFirst()
-                .orElseThrow();
+                .count();
 
-        System.out.println(found.getName());
+        assertThat(newBucketCount).isEqualTo(1);
+
+        // create same name bucket twice
+        assertThatThrownBy(() -> sut.createBucket(now))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("try again with a different bucket name");
     }
 }
