@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  localstack:
+    container_name: localstack
+    # image: localstack/localstack:1.0.4
+    image: localstack/localstack:0.14.5
+    ports:
+      - 4566:4566
+    # @see https://docs.localstack.cloud/localstack/configuration/
+    environment:
+      - DEFAULT_REGION=ap-northeast-1
+      - SERVICES=s3
+      - DATA_DIR=/tmp/localstack/data
+      # for v1 option
+      # @see https://docs.localstack.cloud/localstack/persistence-mechanism/
+      # > Therefore, please note that persistence in LocalStack, as currently intended, is a Pro only featur
+      # - PERSISTENCE=1
+    volumes:
+      - .localstack:/tmp/localstack/
